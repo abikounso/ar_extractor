@@ -10,15 +10,14 @@ end
    
 namespace :db do
   namespace :fixtures do
-    desc "Extract database data to the spec(or test)/fixtures/ directory.
-          Use FIXTURES=table_name[,table_name...] to specify table names to extract.
-          Otherwise, all the table data will be extracted."
+    desc "Extract database data to YAML fixtures."
     task :extract => :environment do
       sql = "SELECT * FROM %s ORDER BY id"
       skip_tables = ['schema_info', 'schema_migrations']
       ActiveRecord::Base.establish_connection
-      fixtures_dir = "#{RAILS_ROOT}/spec/fixtures/"
-      fixtures_dir = "#{RAILS_ROOT}/test/fixtures/" unless FileTest.exist?(fixtures_dir)
+      fixtures_dir = "#{RAILS_ROOT}/"
+      fixtures_dir += "test" unless FileTest.exist?(fixtures_dir += "spec")
+      fixtures_dir += "/fixtures/"
       FileUtils.mkdir_p(fixtures_dir)
 
       if ENV['FIXTURES']
@@ -38,3 +37,4 @@ namespace :db do
     end
   end
 end
+
