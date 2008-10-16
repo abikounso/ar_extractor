@@ -1,0 +1,20 @@
+ar_extractor
+============
+
+== 動作環境
+Rails 2.1.1でのみ、動作確認を行っているが、おそらく他のバージョンでも問題はないと思われる。
+
+
+== 特徴
+同種のプラグイン ar_fixturesと比較して、以下の特徴がある。
+・内部でto_yamlメソッドを使用していないため、UTF-8の文字列も問題なく扱える
+・カラムの表示順が、テーブルのカラムの表示順と同じなので、見やすい
+・RSpecがインストールされている場合は、spec/fixtures/にデータが出力される（インストールされていない場合は、test/fixtures/に出力）
+
+
+== 使い方
+全てのテーブルのデータをYAMLに出力
+rake db:fixtures:extract
+
+FIXTURESにテーブル名を指定すると、そのテーブルのデータだけが出力される
+rake db:fixtures:extract FIXTURES=users,cliets
