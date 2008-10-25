@@ -1,0 +1,1 @@
+SKIP_TABLES = ["schema_info", "schema_migrations"]
