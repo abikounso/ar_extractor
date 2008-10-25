@@ -1,84 +1,102 @@
-= ArExtractor
+= ar_extractor
+* http://github.com/abikounso/ar_extractor/tree/master
 
-* FIX (url)
 
 == DESCRIPTION:
+テスト用のデータを扱うのに便利なプラグイン。
 
-FIX (describe your package)
 
-== FEATURES/PROBLEMS:
+== FEATURES:
+* 同種のプラグイン ar_fixturesと比較して、以下の特徴がある。
+  * 内部でto_yamlメソッドを使用していないため、UTF-8の文字列も問題なく扱える。
+  * カラムの表示順が、テーブルのカラムの表示順と同じなので、見やすい。
+  * RSpecがインストールされている場合は、spec/fixtures/にデータが出力される。（インストールされていない場合は、test/fixtures/に出力）
+  * populator用のrakeファイルを自動生成する機能。
 
-* FIX (list of features or problems)
 
-== SYNOPSIS:
+== PROBLEMS
+* generator
+  * HABTM結合用のテーブルはサポートしていない。
 
-  FIX (code sample of usage)
+
+== USAGE:
+* DB > YAML出力
+  * 全てのテーブルのデータをYAMLに出力。
+    rake db:fixtures:extract
+
+  * FIXTURESにテーブル名を指定すると、そのテーブルのデータだけが出力される。
+    rake db:fixtures:extract FIXTURES=users,cliets
+
+* DBのスキーマを解析して、ダミーデータ自動生成用のrakeファイルをgenerate(populate, faker必須)
+  * ruby script/generate ar_extractor
+    で、
+    lib/tasks/population.rake
+    ができる。
+
+    population.rakeの中身は、こんな感じ。
+------------------------------------------------------------------------------------------
+namespace :db do
+  desc "Erase and fill database"
+  task :populate => :environment do
+    require "populator"
+    require "faker"
+
+    [Accounting, Bank, Client, Collateral, Liability, Team, User].each(&:delete_all)
+    
+    Accounting.populate 20 do |column|
+      column.fiscal_year = 1900..Time.now.year
+      column.net_operating_profit = 1..10000
+      column.depreciation = 1..10000
+      column.amount_repaid = 1..10000
+      column.client_id = 1..20
+    end
+
+    Bank.populate 20 do |column|
+      column.name = Faker::Name.name
+    end
+
+    Client.populate 20 do |column|
+      column.name = Faker::Name.name
+      column.user_id = 1..20
+    end
+
+    Collateral.populate 20 do |column|
+      column.name = Faker::Name.name
+      column.appraised_amount = 1..10000
+      column.client_id = 1..20
+    end
+
+    Liability.populate 20 do |column|
+      column.debt = 1..10000
+      column.bank_id = 1..20
+      column.client_id = 1..20
+      column.collateral_id = 1..20
+    end
+
+    Team.populate 20 do |column|
+      column.name = Faker::Name.name
+      column.leader_id = 1..20
+      column.upper_team_id = 1..20
+    end
+
+    User.populate 20 do |column|
+      column.name = Faker::Name.name
+    end
+
+  end
+end
+------------------------------------------------------------------------------------------
+  * あとは、
+    rake db:populate
+    で、ダミー用のデータがDBに生成される。
+
 
 == REQUIREMENTS:
+* Rails 2.1(動作確認は行なっていないが、恐らく他のバージョンでも問題はないと思われる。)
+* populator(generatorを使用する場合)
+* faker    (generatorを使用する場合)
 
-* FIX (list of requirements)
 
 == INSTALL:
-
-* FIX (sudo gem install, anything else)
-
-== LICENSE:
-
-(The MIT License)
-
-Copyright (c) 2008 FIX
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-'Software'), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-ar_extractor
-============
-
-== 動作環境
-Rails 2.1.1でのみ、動作確認を行っているが、おそらく他のバージョンでも問題はないと思われる。
-
-
-== 特徴
-同種のプラグイン ar_fixturesと比較して、以下の特徴がある。
-・内部でto_yamlメソッドを使用していないため、UTF-8の文字列も問題なく扱える
-・カラムの表示順が、テーブルのカラムの表示順と同じなので、見やすい
-・RSpecがインストールされている場合は、spec/fixtures/にデータが出力される（インストールされていない場合は、test/fixtures/に出力）
-
-
-== 使い方
-全てのテーブルのデータをYAMLに出力
-rake db:fixtures:extract
-
-FIXTURESにテーブル名を指定すると、そのテーブルのデータだけが出力される
-rake db:fixtures:extract FIXTURES=users,cliets
+* 事前に、下記のライブラリをインストールしておくこと
+  * gem install populator faker

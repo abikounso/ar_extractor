@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = ["History.txt", "Manifest.txt", "README.txt"]
   s.files = ["History.txt", "MIT-LICENSE", "Manifest.txt", "README.txt", "Rakefile", "init.rb", "generators/ar_extractor/ar_extractor_generator.rb", "generators/ar_extractor/templates/population.rake", "lib/ar_extractor.rb", "rails/init.rb", "tasks/ar_extractor_tasks.rake", "test/ar_extractor_test.rb"]
   s.has_rdoc = true
-  s.homepage = %q{FIX (url)}
+  s.homepage = %q{http://blog.s21g.com/abikounso}
   s.rdoc_options = ["--main", "README.txt"]
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{ar_extractor}
