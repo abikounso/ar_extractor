@@ -16,10 +16,6 @@
 * テスト用のダミーデータを自動生成。
 
 
-== PROBLEMS
-  * HABTM結合用テーブルのダミーデータ生成はサポートしていない。
-
-
 == USAGE:
 * DB > YAML出力
   * 全てのテーブルのデータをYAMLに出力。
@@ -68,7 +64,7 @@ end
 
 
 == REQUIREMENTS:
-* Rails 2.1(動作確認は行なっていないが、恐らく他のバージョンでも問題はないと思われる。)
+* Rails 2.2以上
 * populator(generatorを使用する場合)
 * faker    (generatorを使用する場合)
 

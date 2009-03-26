@@ -6,7 +6,7 @@ class ArExtractorGenerator < Rails::Generator::NamedBase
   
   def manifest
     sources = []
-    table_names = (ActiveRecord::Base.connection.tables - SKIP_TABLES).map!{|table_name| table_name.singularize.camelize}
+    table_names = (ActiveRecord::Base.connection.tables - ["schema_migrations"]).map!{|table_name| table_name.singularize.camelize}
     
     table_names.each do |table_name|
       source = "#{table_name}.populate 20 do |column|\n"

@@ -1,6 +1,11 @@
+=== 1.2.0 / 2009-03-26
+
+* supported :id => false table
+  * rake db:fixtures:extractが、idを持たないテーブルにも対応した。
+
 === 1.1.0 / 2008-10-25
 
-* add generator command
+* added generator command
   * ruby script/generate ar_extractorで、populator用のrakeファイルを自動生成する機能を追加。
 
 === 1.0.1 / 2008-10-16
