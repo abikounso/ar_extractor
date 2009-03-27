@@ -22,11 +22,11 @@ namespace :db do
           when /create_table/
             tables[table.shift] = table unless table.blank?
             table = []
-            table << line.split('"')[1]
-            has_id = line.split(",").detect { |l| /:id => false/ =~ l }
+            table << line.split(/"/)[1]
+            has_id = line.split(/,/).detect { |l| /:id => false/ =~ l }
             table << "id" unless has_id
           when /t\./
-            column = line.split('"')[1]
+            column = line.split(/"/)[1]
             table << column unless /created_at|updated_at/ =~ column
           end
         end
@@ -40,7 +40,7 @@ namespace :db do
       FileUtils.mkdir_p(fixtures_dir)
       
       tables.each do |table_name, columns|
-        next if ENV["FIXTURES"] && !ENV["FIXTURES"].split(",").include?(table_name)
+        next if ENV["FIXTURES"] && !ENV["FIXTURES"].split(/,/).include?(table_name)
         sql = "SELECT * FROM %s"
         sql += " ORDER BY id" if columns.include?("id")
         records = ActiveRecord::Base.connection.select_all(sql % table_name)
@@ -53,3 +53,4 @@ namespace :db do
     end
   end
 end
+
