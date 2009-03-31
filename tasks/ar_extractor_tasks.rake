@@ -20,7 +20,6 @@ namespace :db do
           next if line.blank?
           case line
           when /create_table/
-            tables[table.shift] = table unless table.blank?
             table = []
             table << line.split(/"/)[1]
             has_id = line.split(/,/).detect { |l| /:id => false/ =~ l }
@@ -28,6 +27,8 @@ namespace :db do
           when /t\./
             column = line.split(/"/)[1]
             table << column unless /created_at|updated_at/ =~ column
+          when /  end/
+            tables[table.shift] = table unless table.blank?
           end
         end
       end
