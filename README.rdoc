@@ -96,7 +96,4 @@ population.rakeの中身は、こんな感じ。
 
 == INSTALL:
 
-* 下記のライブラリは必須
-
-  * populator
-  * faker
+  $ ruby script/plugin install git://github.com/dchelimsky/rspec.git
