@@ -1,6 +1,6 @@
 namespace :db do
   namespace :fixtures do
-    desc "Extract database data to YAML fixtures."
+    desc "Extract DB to YAML fixtures."
     task :extract => :environment do
       table = []
       tables = {}
@@ -28,12 +28,10 @@ namespace :db do
         next if ENV["FIXTURES"] && !ENV["FIXTURES"].split(/,/).include?(table_name)
         order = columns.include?("id") ? " ORDER BY id" : ""
         records = execute_sql(table_name, order)
-        next if records.empty?
-        write_fixtures("w", fixtures_dir + table_name, records, columns) do |record, column, i|
-          entry_fixture(column, record[column])
-        end
+        write_fixtures("w", fixtures_dir + table_name, records, columns) { |record, column, i| entry_fixture(column, record[column]) }
       end
     end
+
 
     task :convert => :environment do
       desc "Convert data from legacy schema to another."
@@ -83,7 +81,8 @@ end
 
 def execute_sql(table_name, order)
   sql = "SELECT * FROM %s" + order
-  ActiveRecord::Base.connection.select_all(sql % table_name)
+  records = ActiveRecord::Base.connection.select_all(sql % table_name)
+  records.empty? ? next : records
 end
 
 def write_fixtures(mode, file_name, records, columns)

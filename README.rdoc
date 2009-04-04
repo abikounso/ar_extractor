@@ -1,12 +1,13 @@
 = ar_extractor
 
 * http://github.com/abikounso/ar_extractor/tree/master
+* http://d.hatena.ne.jp/abikounso/
 
 == DESCRIPTION:
 
-テスト用のデータを扱うのに便利なRailsプラグイン。
+DBから、データをYAML出力するRailsプラグイン。
 
-== FEATURES:
+== FEATURES
 
 * DBのデータをYAMLに変換して、出力。
 
@@ -17,9 +18,9 @@
 * テスト用のダミーデータを自動生成。
 
 
-== SYNOPSIS:
+== SYNOPSIS
 
-* DB > YAML出力
+=== DB => YAML出力
 
   * 全てのテーブルのデータをYAMLに出力。
   
@@ -41,9 +42,10 @@
       gyosyu_cd: category_id
       kanyo_kaikei_getuji_flg: engagement_type
 
+  必ず引数をセットすること
   $ rake db:fixtures:convert DB=foo
 
-* DBのスキーマを解析して、ダミーデータを自動生成。
+=== DBのスキーマを解析して、ダミーデータを自動生成
 
 事前に、populatorとfakerをインストールしておく。
   
