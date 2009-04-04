@@ -3,9 +3,9 @@
 * http://github.com/abikounso/ar_extractor/tree/master
 * http://d.hatena.ne.jp/abikounso/
 
-== DESCRIPTION:
+== DESCRIPTION
 
-DBから、データをYAML出力するRailsプラグイン。
+DBのデータを、YAML形式で出力するRailsプラグイン。
 
 == FEATURES
 
@@ -22,15 +22,15 @@ DBから、データをYAML出力するRailsプラグイン。
 
 === DB => YAML出力
 
-  * 全てのテーブルのデータをYAMLに出力。
+全てのテーブルのデータをYAMLに出力。
   
   $ rake db:fixtures:extract
 
-  * FIXTURESにテーブル名を指定すると、そのテーブルのデータだけが出力される。
+FIXTURESにテーブル名を指定すると、そのテーブルのデータだけが出力される。
   
   $ rake db:fixtures:extract FIXTURES=users,cliets
   
-  * テーブル名、カラム名を別の名前に変換して出力。
+テーブル名、カラム名を別の名前に変換して出力。
   
   # 最初に、config/tables.ymlというファイルを作成し、下記のように記述する。
   cum_kanyosaki(現在のテーブル名):
@@ -42,7 +42,8 @@ DBから、データをYAML出力するRailsプラグイン。
       gyosyu_cd: category_id
       kanyo_kaikei_getuji_flg: engagement_type
 
-  必ず引数をセットすること
+必ず引数をセットすること
+
   $ rake db:fixtures:convert DB=foo
 
 === DBのスキーマを解析して、ダミーデータを自動生成
