@@ -99,4 +99,4 @@ population.rakeの中身は、こんな感じ。
 
 == INSTALL:
 
-  $ ruby script/plugin install git://github.com/dchelimsky/rspec.git
+  $ ruby script/plugin install git://github.com/abikounso/ar_extractor.git
