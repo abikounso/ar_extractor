@@ -28,6 +28,7 @@ namespace :db do
         next if ENV["FIXTURES"] && !ENV["FIXTURES"].split(/,/).include?(table_name)
         order = columns.include?("id") ? " ORDER BY id" : ""
         records = execute_sql(table_name, order)
+        next if records.empty?
         write_fixtures("w", fixtures_dir + table_name, records, columns) { |record, column, i| entry_fixture(column, record[column]) }
       end
     end
@@ -52,6 +53,7 @@ namespace :db do
         before_table = before_table.split(/::/)
         model = before_table.map { |table| table.camelize }.join("::").constantize
         records = execute_sql(before_table[-1], " ORDER BY #{model.primary_key}")
+        next if records.empty?
 
         after_tables.each do |after_table, column_map|
           delete_file = files.detect { |file| %r(#{after_table}.yml$) =~ file }
@@ -81,8 +83,7 @@ end
 
 def execute_sql(table_name, order)
   sql = "SELECT * FROM %s" + order
-  records = ActiveRecord::Base.connection.select_all(sql % table_name)
-  records.empty? ? next : records
+  ActiveRecord::Base.connection.select_all(sql % table_name)
 end
 
 def write_fixtures(mode, file_name, records, columns)
