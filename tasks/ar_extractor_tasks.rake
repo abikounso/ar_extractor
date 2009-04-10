@@ -2,10 +2,12 @@ namespace :db do
   namespace :fixtures do
     desc "Extract DB to YAML fixtures."
     task :extract => :environment do
-      table = []
+      fixtures_dir = db_connection
+
       tables = {}
-      open("#{RAILS_ROOT}/db/schema.rb") do |io|
-        while line = io.gets
+      table = []
+      open("#{RAILS_ROOT}/db/schema.rb") do |file|
+        while line = file.gets
           next if line.blank?
           case line
           when /create_table/
@@ -22,23 +24,21 @@ namespace :db do
         end
       end
 
-      fixtures_dir = db_connection
-
       tables.each do |table_name, columns|
         next if ENV["FIXTURES"] && !ENV["FIXTURES"].split(/,/).include?(table_name)
         order = columns.include?("id") ? " ORDER BY id" : ""
         records = execute_sql(table_name, order)
         next if records.empty?
-        write_fixtures("w", fixtures_dir + table_name, records, columns) { |record, column, i| entry_fixture(column, record[column]) }
+        write_fixtures(fixtures_dir + table_name, records, columns) { |record, column, i| entry_fixture(column, record[column]) }
       end
     end
 
 
     task :convert => :environment do
       desc "Convert data from legacy schema to another."
-      CONFIG_FILE = "config/tables.yml"
+      CONFIG_FILE = "#{RAILS_ROOT}/config/tables.yml"
       if    ENV["DB"].nil?            then raise ArgumentError, "Set argument DB.\ne.g. rake db:fixtuers:convert DB=foo"
-      elsif !File.exist?(CONFIG_FILE) then raise IOError      , "Doesn't exist config/tables.yml"
+      elsif !File.exist?(CONFIG_FILE) then raise IOError      , "Doesn't exist #{CONFIG_FILE}"
       end
 
       require "find"
@@ -48,6 +48,9 @@ namespace :db do
 
       files = []
       Find::find("#{fixtures_dir}") { |path| files << path }
+
+      mod = "ModFantasista"
+      include mod.constantize if File.exist?("#{RAILS_ROOT}/lib/#{mod.underscore}.rb")
 
       table_list.each do |before_table, after_tables|
         before_table = before_table.split(/::/)
@@ -62,12 +65,15 @@ namespace :db do
             files.reject! { |file| file == delete_file }
           end
 
-          write_fixtures("a", fixtures_dir + after_table, records, model.columns) do |record, column, i|
+          write_fixtures(fixtures_dir + after_table, records, model.columns, "a") do |record, column, i|
             next unless column_map[column.name]
+            conditional_branch(column.name, before_table[-1], record) if defined?(conditional_branch)
             entry_fixture(column_map[column.name], record[column.name])
           end
         end
       end
+
+      save_records if defined?(save_records)
     end
   end
 end
@@ -75,7 +81,8 @@ end
 private
 def db_connection(db = nil)
   ActiveRecord::Base.establish_connection(db)
-  FileTest.exist?("spec") ? fixtures_dir = "spec" : fixtures_dir = "test"
+  fixtures_dir = RAILS_ROOT + "/"
+  FileTest.exist?(fixtures_dir + "spec") ? fixtures_dir += "spec" : fixtures_dir += "test"
   fixtures_dir += "/fixtures/"
   FileUtils.mkdir_p(fixtures_dir)
   fixtures_dir
@@ -86,9 +93,19 @@ def execute_sql(table_name, order)
   ActiveRecord::Base.connection.select_all(sql % table_name)
 end
 
-def write_fixtures(mode, file_name, records, columns)
-  open("#{file_name}.yml", mode) do |file|
-    i = 0
+def write_fixtures(file_name, records, columns, mode = "w")
+  yaml = "#{file_name}.yml"
+  i = 0
+  
+  if File.exist?(yaml)
+    open(yaml) do |file|
+      while line = file.gets
+        i += 1 if /^data/ =~ line
+      end
+    end
+  end
+
+  open(yaml, mode) do |file|
     records.each do |record|
       rec = ["data#{i += 1}:"]
       columns.each do |column|

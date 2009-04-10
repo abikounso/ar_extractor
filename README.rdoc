@@ -5,48 +5,65 @@
 
 == DESCRIPTION
 
-DBのデータを、YAML形式で出力するRailsプラグイン。
+DBから、YAML形式でデータを出力するRailsプラグイン。その他、データハンドリングに便利な機能あり。
 
 == FEATURES
 
-* DBのデータをYAMLに変換して、出力。
+* DBから、YAML形式でデータ出力
 
-  * 内部でto_yamlメソッドを使用していないため、UTF-8の文字列も問題なく扱える。
-  * カラムの表示順が、スキーマのそれと同じなので、見やすい。
-  * テーブル名・カラム名を、別の名前に変換して出力することも可能。
+  * to_yamlメソッド不使用のため、UTF-8文字列の取り扱いも問題ない。
+  * DBスキーマと同じ表示順でYAMLが生成されるため、見やすい。
+  * テーブル名・カラム名を、別の名前に変換して出力することも可能。（レガシーDBからデータ移行する際に便利かも）
 
-* テスト用のダミーデータを自動生成。
-
+* DBのスキーマを元に、テスト用のダミーデータを自動生成。
 
 == SYNOPSIS
 
 === DB => YAML出力
 
-全てのテーブルのデータをYAMLに出力。
-  
-  $ rake db:fixtures:extract
+==== 全テーブルのデータをYAML出力
 
-FIXTURESにテーブル名を指定すると、そのテーブルのデータだけが出力される。
+FIXTURESオプションにテーブル名をセットすれば、そのテーブルのデータのみ出力させることができる。
   
-  $ rake db:fixtures:extract FIXTURES=users,cliets
-  
-テーブル名、カラム名を別の名前に変換して出力。
-  
-  # 最初に、config/tables.ymlというファイルを作成し、下記のように記述する。
+  $ rake db:fixtures:extract 【オプション】FIXTURES=users,clients
+
+==== テーブル名、カラム名を別名に変換してYAML出力
+
+下記のような2つのDBがあり、レガシーDB fooから、新DB barへデータを移行させたい場合に、fooのデータをbarのスキーマに変換してYAML出力することができる。
+
+DB名: foo
+  テーブル名: cum_kanyosaki
+    カラム名: kanyosaki_id
+    カラム名: kanyosaki_name
+
+DB名: bar
+  テーブル名: company
+    カラム名: id
+    カラム名: name
+
+1. config/tables.ymlを作成し、変換するするテーブルとカラムを記述する。
+
   cum_kanyosaki(現在のテーブル名):
     companies(新しいテーブル名):
       kanyosaki_id(現在のカラム名): id(新しいカラム名)
-      kanyosaki_cd: code
-      kanyosaki_official_name: name
-      kanyosaki_url: url
-      gyosyu_cd: category_id
-      kanyo_kaikei_getuji_flg: engagement_type
+      kanyosaki_name: name
 
-必ず引数をセットすること
+2. 引数DB(変換元のDB名)をセットし、下記のrakeコマンドを実行する。
 
   $ rake db:fixtures:convert DB=foo
 
-=== DBのスキーマを解析して、ダミーデータを自動生成
+3. test/fixtures(rspecを使っている場合は、spec/fixtures)にYAMLファイルが出力される。
+spec/fixtures/companies.yml
+
+  data1:
+    id: kanyosaki_idのデータ
+    name: kanyosaki_nameのデータ
+
+  data2:
+    id: kanyosaki_idのデータ
+    name: kanyosaki_nameのデータ
+
+=== DBのスキーマを元に、ダミーデータを自動生成
 
 事前に、populatorとfakerをインストールしておく。
   
@@ -88,8 +105,8 @@ population.rakeの中身は、こんな感じ。
   
   rake db:populate
   
-で、ダミー用のデータがDBに格納される。
-
+で、ダミー用のデータがDBに生成される。
+ただし、生成されるダミーデータは全て英語。
 
 == REQUIREMENTS:
 

@@ -4,7 +4,7 @@ namespace :db do
     require "populator"
     require "faker"
 
-    [<%= table_names * ", " %>].each(&:delete_all)
+    [<%= models.join(", ") %>].each(&:delete_all)
     
 <% sources.each do |source| -%>
     <%= source -%>

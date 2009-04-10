@@ -5,16 +5,54 @@ class ArExtractorGenerator < Rails::Generator::NamedBase
   end
   
   def manifest
-    sources = []
-    table_names = (ActiveRecord::Base.connection.tables - ["schema_migrations"]).map!{|table_name| table_name.singularize.camelize}
+    require "find"
     
-    table_names.each do |table_name|
-      source = "#{table_name}.populate 20 do |column|\n"
-      columns = table_name.constantize.columns
+    
+    model_files = []
+    Find::find("#{RAILS_ROOT}/app/models") { |model_file| model_files << model_file unless FileTest::directory?(model_file) }
+    
+    klasses = []
+    inherited_klasses = []
+    model_files.each do |model_file|
+      open(model_file) do |file|
+        while line = file.gets
+          case line
+          when /^class/
+            table = line.split(/ /)
+            base_class = table[3].chomp
+            a = [model_file, table[1], base_class, false]
+            base_class == "ActiveRecord::Base" ? klasses << a : inherited_klasses << a
+          when /establish_connection/
+            base_class == "ActiveRecord::Base" ? klasses[-1][3] = true : inherited_klasses[-1][3] = true
+          end
+        end
+      end
+    end
+
+    delete_klasses = []
+    delete_inherited_klasses = []
+    inherited_klasses.each do |inherited_klass|
+      klass = klasses.detect { |k| k[1] == inherited_klass[2] }
+      if klass
+        delete_klasses << klass
+        delete_inherited_klasses << inherited_klass if klass[3]
+      end
+    end
+    
+    delete_klasses.uniq!
+    klasses.reject! { |klass| klass[3] == true }
+    models = klasses - delete_klasses + inherited_klasses - delete_inherited_klasses
+    models.map! { |model| model[1] }
+
+    sources = []
+    
+    models.each do |model|
+      source = "#{model}.populate 20 do |column|\n"
+      columns = model.constantize.columns
       columns.each do |column|
         case column.type
         when :float
-          value = "0.1..100.00"
+          value = "0.1"
         when :integer
           case column.name
           when /_id/
@@ -49,8 +87,9 @@ class ArExtractorGenerator < Rails::Generator::NamedBase
     end
     
     record do |m|
-      m.template "population.rake", "lib/tasks/population.rake", :assigns => {:sources => sources, :table_names => table_names}
+      m.template "population.rake", "lib/tasks/population.rake", :assigns => {:sources => sources, :models => models}
     end
   end
 end
+
 
