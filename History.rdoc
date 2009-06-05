@@ -1,3 +1,7 @@
+=== Version 1.3.1 / 2009-06-05
+
+* 改行の入ったデータをrake db:fixtures:extractで出力すると、rake db:fixtures:load時にエラーが発生する問題を修正。
+
 === Version 1.3.0 / 2009-04-03
 
 * rake db:fixtures:convertを追加。

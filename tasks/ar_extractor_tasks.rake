@@ -49,13 +49,28 @@ namespace :db do
       files = []
       Find::find("#{fixtures_dir}") { |path| files << path }
 
-      mod = "ModFantasista"
-      include mod.constantize if File.exist?("#{RAILS_ROOT}/lib/#{mod.underscore}.rb")
+      mod = exist_module?
+      include mod if mod
+
+      com_tantosya_conditions = ""
+      cum_kanyosaki_conditions = ""
 
       table_list.each do |before_table, after_tables|
         before_table = before_table.split(/::/)
         model = before_table.map { |table| table.camelize }.join("::").constantize
-        records = execute_sql(before_table[-1], " ORDER BY #{model.primary_key}")
+        conditions = ""
+        if exist_module?
+          case before_table[-1]
+          when "com_tantosya"
+            com_tantosya_conditions = "taisya_date IS NULL AND birthday IS NOT NULL"
+            conditions = " WHERE #{ com_tantosya_conditions }"
+          when "cum_kanyosaki"
+            cum_kanyosaki_conditions = "kanyosaki_cd < 990000"
+            conditions = " WHERE #{ cum_kanyosaki_conditions }"
+          end
+        end
+        
+        records = execute_sql(before_table[-1], "#{ conditions } ORDER BY #{model.primary_key}")
         next if records.empty?
 
         after_tables.each do |after_table, column_map|
@@ -73,7 +88,7 @@ namespace :db do
         end
       end
 
-      save_records if defined?(save_records)
+      save_records(com_tantosya_conditions, cum_kanyosaki_conditions) if defined?(save_records)
     end
   end
 end
@@ -82,7 +97,7 @@ private
 def db_connection(db = nil)
   ActiveRecord::Base.establish_connection(db)
   fixtures_dir = RAILS_ROOT + "/"
-  FileTest.exist?(fixtures_dir + "spec") ? fixtures_dir += "spec" : fixtures_dir += "test"
+  fixtures_dir += File.exist?(fixtures_dir + "spec") && !exist_module? ? "spec" : "test"
   fixtures_dir += "/fixtures/"
   FileUtils.mkdir_p(fixtures_dir)
   fixtures_dir
@@ -121,9 +136,19 @@ def entry_fixture(column, value)
   if value.nil? || (value == "0" && column =~ /_id$|^type$/)
     nil
   else
+    return unless value.class == String
     value.gsub!(/\t|\?/, "")
     value.gsub!(/\[/, "［")
     value.gsub!(/\]/, "］")
-    "  #{column}: #{value}"
+    if value =~ /\n/
+      "  #{column}: |\n    " + value.split("\n").join("\n    ")
+    else
+      "  #{column}: #{value}"
+    end
   end
+end
+
+def exist_module?
+  mod = "FantasistaModule"
+  File.exist?("#{RAILS_ROOT}/lib/#{mod.underscore}.rb") ? mod.constantize : false
 end
