@@ -24,6 +24,8 @@ namespace :db do
         end
       end
 
+      tables.delete("sessions")
+
       tables.each do |table_name, columns|
         next if ENV["FIXTURES"] && !ENV["FIXTURES"].split(/,/).include?(table_name)
         order = columns.include?("id") ? " ORDER BY id" : ""
