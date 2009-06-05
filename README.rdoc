@@ -5,9 +5,14 @@
 
 == DESCRIPTION
 
+=== 日本語
+
 DBから、YAML形式でデータを出力するRailsプラグイン。
-This Rails plugin makes it easy to dump database to yaml fixtures.
 その他、データハンドリングに便利な機能あり。
+
+=== English
+
+This Rails plugin makes it easy to dump database to yaml fixtures.
 
 == FEATURES
 
