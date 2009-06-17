@@ -1,7 +1,8 @@
 = ar_extractor
 
 * http://github.com/abikounso/ar_extractor/tree/master
-* http://d.hatena.ne.jp/abikounso/
+* http://d.hatena.ne.jp/abikounso
+* http://twitter.com/abikounso
 
 == DESCRIPTION
 
@@ -10,7 +11,7 @@
 DBから、YAML形式でデータを出力するRailsプラグイン。
 その他、データハンドリングに便利な機能あり。
 
-=== English
+=== in English
 
 This Rails plugin makes it easy to dump database to yaml fixtures.
 
@@ -18,7 +19,7 @@ This Rails plugin makes it easy to dump database to yaml fixtures.
 
 * DBから、YAML形式でデータ出力
 
-  * to_yamlメソッド不使用のため、UTF-8文字列の取り扱いも問題ない。
+  * to_yamlメソッド不使用のため、UTF-8文字列の扱いも問題なし。
   * DBスキーマと同じ表示順でYAMLが生成されるため、見やすい。
   * テーブル名・カラム名を、別の名前に変換して出力することも可能。（レガシーDBからデータ移行する際に便利かも）
 
@@ -40,8 +41,8 @@ FIXTURESオプションにテーブル名をセットすれば、そのテーブ
 
 DB名: foo
   テーブル名: cum_kanyosaki
-    カラム名: kanyosaki_id
     カラム名: kanyosaki_name
+    カラム名: kanyosaki_id
 
 DB名: bar
   テーブル名: company
@@ -75,7 +76,7 @@ spec/fixtures/companies.yml
 事前に、populatorとfakerをインストールしておく。
   
   $ gem install populator faker  
-  $ ruby script/generate ar_extractor
+  $ ruby script/generate random_data
    
 で、
   
@@ -117,9 +118,15 @@ population.rakeの中身は、こんな感じ。
 
 == REQUIREMENTS:
 
+=== 日本語
+
 * Rails 2.2以上
 * populator(generatorを使用する場合)
 * faker    (generatorを使用する場合)
+
+=== in English
+
+* Rails 2.2 and above
 
 == INSTALL:
 

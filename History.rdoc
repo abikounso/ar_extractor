@@ -1,10 +1,16 @@
+=== Version 1.3.2 / 2009-06-17
+
+* ar_extractor_generator.rbをrandom_data_generator.rbに変更。
+* Renamed ar_extractor_generator.rb to random_data_generator.rb.
+
 === Version 1.3.1 / 2009-06-05
 
 * 改行の入ったデータをrake db:fixtures:extractで出力すると、rake db:fixtures:load時にエラーが発生する問題を修正。
 
 === Version 1.3.0 / 2009-04-03
 
-* rake db:fixtures:convertを追加。
+* "rake db:fixtures:convert"を追加。
+* Added "rake db:fixtures:convert" command.
 
 === Version 1.2.0 / 2009-03-26
 

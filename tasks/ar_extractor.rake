@@ -50,7 +50,6 @@ namespace :db do
 
       files = []
       Find::find("#{fixtures_dir}") { |path| files << path }
-
       mod = exist_module?
       include mod if mod
 
@@ -76,7 +75,7 @@ namespace :db do
         next if records.empty?
 
         after_tables.each do |after_table, column_map|
-          delete_file = files.detect { |file| %r(#{after_table}.yml$) =~ file }
+          delete_file = files.detect { |file| %r(/#{after_table}.yml$) =~ file }
           if delete_file
             FileUtils.rm(delete_file)
             files.reject! { |file| file == delete_file }

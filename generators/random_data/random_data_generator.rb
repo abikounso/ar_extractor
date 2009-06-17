@@ -1,4 +1,4 @@
-class ArExtractorGenerator < Rails::Generator::NamedBase
+class RandomDataGenerator < Rails::Generator::NamedBase
   def initialize(runtime_args, runtime_options = {})
     runtime_args = ["ar"]
     super
@@ -6,7 +6,6 @@ class ArExtractorGenerator < Rails::Generator::NamedBase
   
   def manifest
     require "find"
-    
     
     model_files = []
     Find::find("#{RAILS_ROOT}/app/models") { |model_file| model_files << model_file unless FileTest::directory?(model_file) }
@@ -91,5 +90,3 @@ class ArExtractorGenerator < Rails::Generator::NamedBase
     end
   end
 end
-
-
