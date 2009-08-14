@@ -17,7 +17,7 @@ namespace :db do
             table << "id" unless has_id
           when /t\./
             column = line.split(/"/)[1]
-            table << column unless /created_at|updated_at/ =~ column
+            table << column # unless /created_at|updated_at/ =~ column
           when /  end/
             tables[table.shift] = table unless table.blank?
           end
@@ -63,7 +63,7 @@ namespace :db do
         if exist_module?
           case before_table[-1]
           when "com_tantosya"
-            com_tantosya_conditions = "taisya_date IS NULL AND birthday IS NOT NULL"
+            com_tantosya_conditions = "birthday IS NOT NULL AND taisya_date IS NULL"
             conditions = " WHERE #{ com_tantosya_conditions }"
           when "cum_kanyosaki"
             cum_kanyosaki_conditions = "kanyosaki_cd < 990000"
@@ -89,7 +89,7 @@ namespace :db do
         end
       end
 
-      save_records(com_tantosya_conditions, cum_kanyosaki_conditions) if defined?(save_records)
+      save_records(com_tantosya_conditions, cum_kanyosaki_conditions, ENV["RAILS_ENV"]) if defined?(save_records)
     end
   end
 end
@@ -138,6 +138,7 @@ def entry_fixture(column, value)
     nil
   else
     return unless value.class == String
+    value.strip!
     value.gsub!(/\t|\?/, "")
     value.gsub!(/\[/, "［")
     value.gsub!(/\]/, "］")
@@ -153,3 +154,4 @@ def exist_module?
   mod = "FantasistaModule"
   File.exist?("#{RAILS_ROOT}/lib/#{mod.underscore}.rb") ? mod.constantize : false
 end
+
