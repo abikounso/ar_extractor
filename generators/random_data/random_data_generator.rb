@@ -42,14 +42,17 @@ class RandomDataGenerator < Rails::Generator::NamedBase
     klasses.reject! { |klass| klass[3] == true }
     models = klasses - delete_klasses + inherited_klasses - delete_inherited_klasses
     models.map! { |model| model[1] }
+    
 
     sources = []
+    exclude_model = []
     
     models.each do |model|
       source = "#{model}.populate 20 do |column|\n"
       begin
         columns = model.constantize.columns
       rescue
+        exclude_model << model
         next
       end
       columns.each do |column|
@@ -88,7 +91,8 @@ class RandomDataGenerator < Rails::Generator::NamedBase
       end
       sources << source
     end
-    
+
+    exclude_model.each { |e|  models.delete(e)  }
     record do |m|
       m.template "population.rake", "lib/tasks/population.rake", :assigns => {:sources => sources, :models => models}
     end
