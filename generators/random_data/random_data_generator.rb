@@ -47,7 +47,11 @@ class RandomDataGenerator < Rails::Generator::NamedBase
     
     models.each do |model|
       source = "#{model}.populate 20 do |column|\n"
-      columns = model.constantize.columns
+      begin
+        columns = model.constantize.columns
+      rescue
+        next
+      end
       columns.each do |column|
         case column.type
         when :float
